@@ -127,9 +127,10 @@
 					<span class="badge border border-accent-yellow/40 bg-accent-yellow/20 text-yellow-800 dark:text-yellow-200">Selective cohort</span>
 					<span class="badge border border-accent-blue/30 bg-accent-blue/10 text-accent-blue dark:text-blue-200">Open-access ethos</span>
 				</div>
-				<h1 class="heading-display max-w-4xl">
+				<h1 class="heading-display max-w-4xl">Dialogue</h1>
+				<p class="mt-4 max-w-3xl font-display text-2xl font-bold leading-tight text-journal-text dark:text-journal-text-dark md:text-3xl">
 					Turn what you notice into writing that matters.
-				</h1>
+				</p>
 				<div class="divider-thick mt-6 max-w-4xl"></div>
 				<p class="body-text mt-6 max-w-3xl text-lg md:text-xl">
 					For sixth-form students who read the news and think: I could say something sharper
