@@ -3,7 +3,7 @@
  * schema; these mirror only the columns the SvelteKit code actually consumes.
  */
 
-export type Role = 'student' | 'supervisor' | 'admin';
+export type Role = 'student' | 'teacher' | 'supervisor' | 'editor' | 'admin';
 
 export type StudentStage =
 	| 'onboarding_incomplete'

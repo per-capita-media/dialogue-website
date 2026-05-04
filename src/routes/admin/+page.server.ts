@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		recentAudit
 	] = await Promise.all([
 		sb.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
-		sb.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supervisor'),
+		sb.from('profiles').select('id', { count: 'exact', head: true }).in('role', ['supervisor', 'editor']),
 		sb.from('pitches').select('id', { count: 'exact', head: true }),
 		sb.from('articles').select('id', { count: 'exact', head: true }),
 		sb.from('quiz_attempts').select('id', { count: 'exact', head: true }),

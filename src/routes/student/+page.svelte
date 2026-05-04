@@ -59,7 +59,7 @@
 	/>
 	<DashboardCard
 		title="Messages"
-		description="Talk to your supervisor or the team."
+		description="Talk to your editor or the programme team."
 		href="/student/messages"
 		status="in-progress"
 	/>

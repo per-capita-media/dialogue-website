@@ -59,7 +59,6 @@ stable
 as $$
   select uid = auth.uid();
 $$;
-
 -- ============================================================
 -- supabase/migrations/002_profiles.sql
 -- ============================================================
@@ -91,7 +90,6 @@ create index idx_profiles_role on public.profiles(role);
 create trigger trg_profiles_updated_at
   before update on public.profiles
   for each row execute function public.touch_updated_at();
-
 -- ============================================================
 -- supabase/migrations/003_student_themes.sql
 -- ============================================================
@@ -119,7 +117,6 @@ create table public.student_themes (
 );
 
 create index idx_student_themes_student on public.student_themes(student_id);
-
 -- ============================================================
 -- supabase/migrations/004_assignments.sql
 -- ============================================================
@@ -140,7 +137,6 @@ create table public.student_supervisor_assignments (
 
 create index idx_assignments_student on public.student_supervisor_assignments(student_id);
 create index idx_assignments_supervisor on public.student_supervisor_assignments(supervisor_id);
-
 -- ============================================================
 -- supabase/migrations/005_rls_helpers.sql
 -- ============================================================
@@ -179,7 +175,6 @@ as $$
     where student_id = student and supervisor_id = auth.uid()
   );
 $$;
-
 -- ============================================================
 -- supabase/migrations/006_profiles_rls.sql
 -- ============================================================
@@ -257,101 +252,6 @@ begin
 end;
 $$;
 
--- ============================================================
--- supabase/migrations/021_bootstrap_profile_rpc.sql
--- ============================================================
--- 021_bootstrap_profile_rpc.sql
--- Trusted service-role code needs a narrow way to create/update elevated
--- profiles while ordinary browser-authenticated users remain unable to set
--- role/stage/lock fields.
-
-create or replace function public.profiles_force_student_role()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if current_setting('app.profile_bootstrap', true) = 'on' then
-    return new;
-  end if;
-
-  if not public.is_admin() then
-    new.role := 'student';
-    new.themes_locked := false;
-    new.onboarding_complete := false;
-    new.current_stage := 'onboarding_incomplete';
-  end if;
-  return new;
-end;
-$$;
-
-create or replace function public.profiles_protect_sensitive()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if current_setting('app.profile_bootstrap', true) = 'on' then
-    return new;
-  end if;
-
-  if not public.is_admin() then
-    new.role := old.role;
-    new.themes_locked := old.themes_locked;
-    new.current_stage := old.current_stage;
-  end if;
-  return new;
-end;
-$$;
-
-create or replace function public.bootstrap_profile(
-  p_id uuid,
-  p_email text,
-  p_full_name text,
-  p_role user_role,
-  p_onboarding_complete boolean default true
-)
-returns public.profiles
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_profile public.profiles;
-begin
-  perform set_config('app.profile_bootstrap', 'on', true);
-
-  insert into public.profiles (
-    id,
-    email,
-    full_name,
-    role,
-    onboarding_complete
-  )
-  values (
-    p_id,
-    p_email,
-    p_full_name,
-    p_role,
-    p_onboarding_complete
-  )
-  on conflict (id) do update set
-    email = excluded.email,
-    full_name = excluded.full_name,
-    role = excluded.role,
-    onboarding_complete = excluded.onboarding_complete,
-    updated_at = now()
-  returning * into v_profile;
-
-  return v_profile;
-end;
-$$;
-
-revoke all on function public.bootstrap_profile(uuid, text, text, user_role, boolean) from public;
-grant execute on function public.bootstrap_profile(uuid, text, text, user_role, boolean) to service_role;
-
 create trigger trg_profiles_protect_sensitive
   before update on public.profiles
   for each row execute function public.profiles_protect_sensitive();
@@ -359,7 +259,6 @@ create trigger trg_profiles_protect_sensitive
 -- ── Delete: admin only ────────────────────────────────────────────────
 create policy profiles_delete on public.profiles
   for delete using (public.is_admin());
-
 -- ============================================================
 -- supabase/migrations/007_student_themes_rls.sql
 -- ============================================================
@@ -438,7 +337,6 @@ create constraint trigger trg_two_themes
   after insert or delete on public.student_themes
   deferrable initially deferred
   for each row execute function public.enforce_two_themes();
-
 -- ============================================================
 -- supabase/migrations/008_assignments_rls.sql
 -- ============================================================
@@ -498,7 +396,6 @@ $$;
 create trigger trg_validate_assignment_roles
   before insert or update on public.student_supervisor_assignments
   for each row execute function public.validate_assignment_roles();
-
 -- ============================================================
 -- supabase/migrations/009_learning_quizzes.sql
 -- ============================================================
@@ -604,7 +501,6 @@ create policy quiz_questions_authed_view on public.quiz_questions
 -- because they hit the admin-only policy first only when admin policy is not
 -- joined. To keep things bulletproof, also revoke direct table access for
 -- non-admins in the API layer.)
-
 -- ============================================================
 -- supabase/migrations/010_quiz_attempts.sql
 -- ============================================================
@@ -638,7 +534,6 @@ create policy attempts_insert on public.quiz_attempts
 -- No update; if you want a clean history. Admin can delete if needed.
 create policy attempts_admin_delete on public.quiz_attempts
   for delete using (public.is_admin());
-
 -- ============================================================
 -- supabase/migrations/011_pitches.sql
 -- ============================================================
@@ -772,7 +667,6 @@ $$;
 create trigger trg_pitch_status_check
   before update on public.pitches
   for each row execute function public.enforce_pitch_status_transitions();
-
 -- ============================================================
 -- supabase/migrations/012_articles_feedback.sql
 -- ============================================================
@@ -947,7 +841,6 @@ create policy article_feedback_insert on public.article_feedback
 
 create policy article_feedback_delete on public.article_feedback
   for delete using (public.is_admin() or author_id = auth.uid());
-
 -- ============================================================
 -- supabase/migrations/013_messaging.sql
 -- ============================================================
@@ -1092,7 +985,6 @@ create policy messages_update_read on public.messages
 
 create policy messages_delete on public.messages
   for delete using (public.is_admin());
-
 -- ============================================================
 -- supabase/migrations/014_audit_log.sql
 -- ============================================================
@@ -1120,7 +1012,6 @@ create policy audit_log_admin_select on public.audit_log
 -- No insert policy is needed because the application writes only via the
 -- service-role client (which bypasses RLS). Attempted inserts via the
 -- anon/auth role are denied by default.
-
 -- ============================================================
 -- supabase/migrations/015_storage_policies.sql
 -- ============================================================
@@ -1160,7 +1051,6 @@ create policy lm_admin_write on storage.objects
   for all to authenticated
   using (bucket_id = 'learning-materials' and public.is_admin())
   with check (bucket_id = 'learning-materials' and public.is_admin());
-
 -- ============================================================
 -- supabase/migrations/016_compute_stage.sql
 -- ============================================================
@@ -1286,46 +1176,6 @@ begin
 end;
 $$;
 
--- ============================================================
--- supabase/migrations/022_fix_stage_trigger_profile_updates.sql
--- ============================================================
--- 022_fix_stage_trigger_profile_updates.sql
--- The original stage trigger referenced NEW.student_id inside an expression
--- that also runs for profiles, where student_id does not exist. Branch before
--- touching table-specific fields so profile onboarding updates can recompute.
-
-create or replace function public.trg_recompute_stage()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_student uuid;
-begin
-  if tg_table_name = 'profiles' then
-    if tg_op = 'DELETE' then
-      v_student := old.id;
-    else
-      v_student := new.id;
-    end if;
-  else
-    if tg_op = 'DELETE' then
-      v_student := old.student_id;
-    else
-      v_student := new.student_id;
-    end if;
-  end if;
-
-  if v_student is not null then
-    update public.profiles
-       set current_stage = public.compute_stage(v_student)
-     where id = v_student;
-  end if;
-  return null;
-end;
-$$;
-
 create trigger trg_quiz_attempts_stage
   after insert or update or delete on public.quiz_attempts
   for each row execute function public.trg_recompute_stage();
@@ -1341,7 +1191,6 @@ create trigger trg_articles_stage
 create trigger trg_profiles_stage
   after update of onboarding_complete on public.profiles
   for each row execute function public.trg_recompute_stage();
-
 -- ============================================================
 -- supabase/migrations/017_signup_invitations.sql
 -- ============================================================
@@ -1380,7 +1229,6 @@ create policy invitations_admin_select on public.signup_invitations
 
 create policy invitations_admin_write on public.signup_invitations
   for all using (public.is_admin()) with check (public.is_admin());
-
 -- ============================================================
 -- supabase/migrations/018_grants.sql
 -- ============================================================
@@ -1418,7 +1266,6 @@ alter default privileges in schema public grant all on functions to postgres, se
 
 alter default privileges in schema public grant select, insert, update, delete on tables    to anon, authenticated;
 alter default privileges in schema public grant usage, select                  on sequences to anon, authenticated;
-
 -- ============================================================
 -- supabase/migrations/019_quiz_answer_hardening.sql
 -- ============================================================
@@ -1435,7 +1282,6 @@ alter view public.quiz_questions_public set (security_invoker = false);
 -- still available through the admin RLS policy; service_role keeps full grants.
 revoke select on public.quiz_questions from anon, authenticated;
 grant select on public.quiz_questions_public to authenticated;
-
 -- ============================================================
 -- supabase/migrations/020_service_role_profile_bootstrap.sql
 -- ============================================================
@@ -1483,4 +1329,362 @@ begin
   end if;
   return new;
 end;
+$$;
+-- ============================================================
+-- supabase/migrations/021_bootstrap_profile_rpc.sql
+-- ============================================================
+-- 021_bootstrap_profile_rpc.sql
+-- Trusted service-role code needs a narrow way to create/update elevated
+-- profiles while ordinary browser-authenticated users remain unable to set
+-- role/stage/lock fields.
+
+create or replace function public.profiles_force_student_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if current_setting('app.profile_bootstrap', true) = 'on' then
+    return new;
+  end if;
+
+  if not public.is_admin() then
+    new.role := 'student';
+    new.themes_locked := false;
+    new.onboarding_complete := false;
+    new.current_stage := 'onboarding_incomplete';
+  end if;
+  return new;
+end;
+$$;
+
+create or replace function public.profiles_protect_sensitive()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if current_setting('app.profile_bootstrap', true) = 'on' then
+    return new;
+  end if;
+
+  if not public.is_admin() then
+    new.role := old.role;
+    new.themes_locked := old.themes_locked;
+    new.current_stage := old.current_stage;
+  end if;
+  return new;
+end;
+$$;
+
+create or replace function public.bootstrap_profile(
+  p_id uuid,
+  p_email text,
+  p_full_name text,
+  p_role user_role,
+  p_onboarding_complete boolean default true
+)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_profile public.profiles;
+begin
+  perform set_config('app.profile_bootstrap', 'on', true);
+
+  insert into public.profiles (
+    id,
+    email,
+    full_name,
+    role,
+    onboarding_complete
+  )
+  values (
+    p_id,
+    p_email,
+    p_full_name,
+    p_role,
+    p_onboarding_complete
+  )
+  on conflict (id) do update set
+    email = excluded.email,
+    full_name = excluded.full_name,
+    role = excluded.role,
+    onboarding_complete = excluded.onboarding_complete,
+    updated_at = now()
+  returning * into v_profile;
+
+  return v_profile;
+end;
+$$;
+
+revoke all on function public.bootstrap_profile(uuid, text, text, user_role, boolean) from public;
+grant execute on function public.bootstrap_profile(uuid, text, text, user_role, boolean) to service_role;
+-- ============================================================
+-- supabase/migrations/022_fix_stage_trigger_profile_updates.sql
+-- ============================================================
+-- 022_fix_stage_trigger_profile_updates.sql
+-- The original stage trigger referenced NEW.student_id inside an expression
+-- that also runs for profiles, where student_id does not exist. Branch before
+-- touching table-specific fields so profile onboarding updates can recompute.
+
+create or replace function public.trg_recompute_stage()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_student uuid;
+begin
+  if tg_table_name = 'profiles' then
+    if tg_op = 'DELETE' then
+      v_student := old.id;
+    else
+      v_student := new.id;
+    end if;
+  else
+    if tg_op = 'DELETE' then
+      v_student := old.student_id;
+    else
+      v_student := new.student_id;
+    end if;
+  end if;
+
+  if v_student is not null then
+    update public.profiles
+       set current_stage = public.compute_stage(v_student)
+     where id = v_student;
+  end if;
+  return null;
+end;
+$$;
+-- ============================================================
+-- supabase/migrations/023_teacher_editor_enum_values.sql
+-- ============================================================
+-- 023_teacher_editor_enum_values.sql
+-- Run this first; PostgreSQL enum values cannot be safely used elsewhere in
+-- the same migration transaction in some Supabase runners.
+
+alter type user_role add value if not exists 'teacher';
+alter type user_role add value if not exists 'editor';
+-- ============================================================
+-- supabase/migrations/024_teacher_editor_policies.sql
+-- ============================================================
+-- 024_teacher_editor_policies.sql
+-- Adds teacher/editor policy semantics after the enum values are committed.
+-- Existing supervisor accounts remain valid as legacy editor-equivalent staff.
+
+alter table public.signup_invitations
+  drop constraint if exists signup_invitations_role_check;
+
+alter table public.signup_invitations
+  add constraint signup_invitations_role_check
+  check (role in ('supervisor', 'editor', 'teacher', 'admin'));
+
+create or replace function public.is_supervisor_of(student uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.student_supervisor_assignments
+    where student_id = student and supervisor_id = auth.uid()
+  );
+$$;
+
+create or replace function public.is_teacher_of(student uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.profiles teacher
+    join public.profiles pupil
+      on lower(pupil.teacher_email) = lower(teacher.email)
+    where teacher.id = auth.uid()
+      and teacher.role = 'teacher'
+      and pupil.id = student
+      and pupil.role = 'student'
+  );
+$$;
+
+drop policy if exists profiles_select on public.profiles;
+create policy profiles_select on public.profiles
+  for select
+  using (
+    public.is_self(id)
+    or public.is_supervisor_of(id)
+    or public.is_teacher_of(id)
+    or public.is_admin()
+  );
+
+create or replace function public.validate_assignment_roles()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_student_role user_role;
+  v_supervisor_role user_role;
+begin
+  v_student_role    := (select role from public.profiles where id = new.student_id);
+  v_supervisor_role := (select role from public.profiles where id = new.supervisor_id);
+
+  if v_student_role is null or v_supervisor_role is null then
+    raise exception 'assignment references missing profile';
+  end if;
+  if v_student_role <> 'student' then
+    raise exception 'student_id must reference a student profile';
+  end if;
+  if v_supervisor_role not in ('supervisor', 'editor') then
+    raise exception 'supervisor_id must reference an editor profile';
+  end if;
+  return new;
+end;
+$$;
+
+create or replace function public.validate_conversation_pair()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_role_a user_role;
+  v_role_b user_role;
+begin
+  v_role_a := (select role from public.profiles where id = new.participant_a);
+  v_role_b := (select role from public.profiles where id = new.participant_b);
+
+  if v_role_a is null or v_role_b is null then
+    raise exception 'conversation references missing profile';
+  end if;
+
+  if new.kind = 'student_supervisor' then
+    if not ((v_role_a = 'student' and v_role_b in ('supervisor', 'editor'))
+         or (v_role_a in ('supervisor', 'editor') and v_role_b = 'student')) then
+      raise exception 'student_supervisor conversation requires one student + one editor';
+    end if;
+    declare s uuid; sup uuid;
+    begin
+      if v_role_a = 'student' then s := new.participant_a; sup := new.participant_b;
+      else s := new.participant_b; sup := new.participant_a; end if;
+      if not exists (
+        select 1 from public.student_supervisor_assignments
+        where student_id = s and supervisor_id = sup
+      ) then
+        raise exception 'editor not assigned to this student';
+      end if;
+    end;
+  elsif new.kind = 'admin_student' then
+    if not ((v_role_a = 'admin' and v_role_b = 'student')
+         or (v_role_a = 'student' and v_role_b = 'admin')) then
+      raise exception 'admin_student conversation requires admin + student';
+    end if;
+  elsif new.kind = 'admin_supervisor' then
+    if not ((v_role_a = 'admin' and v_role_b in ('supervisor', 'editor', 'teacher'))
+         or (v_role_a in ('supervisor', 'editor', 'teacher') and v_role_b = 'admin')) then
+      raise exception 'admin_supervisor conversation requires admin + staff';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+-- ============================================================
+-- supabase/migrations/025_teacher_student_links.sql
+-- ============================================================
+-- 025_teacher_student_links.sql
+-- Production teacher access should be explicit. The earlier MVP email-match
+-- fallback is replaced with admin-managed teacher/student links.
+
+create table if not exists public.teacher_student_links (
+  id uuid primary key default gen_random_uuid(),
+  teacher_id uuid not null references public.profiles(id) on delete cascade,
+  student_id uuid not null references public.profiles(id) on delete cascade,
+  assigned_by uuid references public.profiles(id) on delete set null,
+  assigned_at timestamptz not null default now(),
+  unique (teacher_id, student_id)
+);
+
+create index if not exists idx_teacher_links_teacher on public.teacher_student_links(teacher_id);
+create index if not exists idx_teacher_links_student on public.teacher_student_links(student_id);
+
+alter table public.teacher_student_links enable row level security;
+
+drop policy if exists teacher_links_select on public.teacher_student_links;
+create policy teacher_links_select on public.teacher_student_links
+  for select using (
+    public.is_admin()
+    or public.is_self(teacher_id)
+    or public.is_self(student_id)
+  );
+
+drop policy if exists teacher_links_insert on public.teacher_student_links;
+create policy teacher_links_insert on public.teacher_student_links
+  for insert with check (public.is_admin());
+
+drop policy if exists teacher_links_update on public.teacher_student_links;
+create policy teacher_links_update on public.teacher_student_links
+  for update using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists teacher_links_delete on public.teacher_student_links;
+create policy teacher_links_delete on public.teacher_student_links
+  for delete using (public.is_admin());
+
+create or replace function public.validate_teacher_student_link()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_teacher_role user_role;
+  v_student_role user_role;
+begin
+  v_teacher_role := (select role from public.profiles where id = new.teacher_id);
+  v_student_role := (select role from public.profiles where id = new.student_id);
+
+  if v_teacher_role <> 'teacher' then
+    raise exception 'teacher_id must reference a teacher profile';
+  end if;
+
+  if v_student_role <> 'student' then
+    raise exception 'student_id must reference a student profile';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_validate_teacher_student_link on public.teacher_student_links;
+create trigger trg_validate_teacher_student_link
+  before insert or update on public.teacher_student_links
+  for each row execute function public.validate_teacher_student_link();
+
+create or replace function public.is_teacher_of(student uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.teacher_student_links tsl
+    join public.profiles teacher on teacher.id = tsl.teacher_id
+    where tsl.student_id = student
+      and tsl.teacher_id = auth.uid()
+      and teacher.role = 'teacher'
+  );
 $$;

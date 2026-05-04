@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let title: string = 'Article 2 is locked';
 	export let body: string =
-		'Article 2 will unlock once your supervisor (or an admin) opens it. You will be notified.';
+		'Article 2 will unlock once your editor (or an admin) opens it. You will be notified.';
 </script>
 
 <div class="card text-center py-16">

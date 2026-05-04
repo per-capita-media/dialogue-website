@@ -5,10 +5,11 @@
  *
  * Creates:
  *   - admin@dialogue.local / password: dialogue123
- *   - sup1@dialogue.local  / password: dialogue123
+ *   - editor@dialogue.local / password: dialogue123
+ *   - teacher@school.test   / password: dialogue123
  *   - stu1@dialogue.local  / password: dialogue123 (theme: Economics, Law)
  *   - stu2@dialogue.local  / password: dialogue123 (theme: Technology and AI, History and Politics)
- *   - links sup1 -> stu1, stu2
+ *   - links editor -> stu1, stu2
  *   - one document material + 5-question doc quiz (passed-only mock content)
  *   - one webinar material + 5-question webinar quiz
  *
@@ -25,7 +26,12 @@ if (!url || !key) {
 }
 const sb = createClient(url, key, { auth: { persistSession: false } });
 
-async function ensureUser(email: string, password: string, fullName: string, role: 'student' | 'supervisor' | 'admin') {
+async function ensureUser(
+	email: string,
+	password: string,
+	fullName: string,
+	role: 'student' | 'teacher' | 'supervisor' | 'editor' | 'admin'
+) {
 	const { data: list } = await sb.auth.admin.listUsers();
 	let user = list.users.find((u) => u.email === email);
 	if (!user) {
@@ -46,6 +52,8 @@ async function ensureUser(email: string, password: string, fullName: string, rol
 
 const adminId = await ensureUser('admin@dialogue.local', 'dialogue123', 'Admin User', 'admin');
 const supId = await ensureUser('sup1@dialogue.local', 'dialogue123', 'Sam Supervisor', 'supervisor');
+const editorId = await ensureUser('editor@dialogue.local', 'dialogue123', 'Eden Editor', 'editor');
+const teacherId = await ensureUser('teacher@school.test', 'dialogue123', 'Taylor Teacher', 'teacher');
 const stu1Id = await ensureUser('stu1@dialogue.local', 'dialogue123', 'Sara Student', 'student');
 const stu2Id = await ensureUser('stu2@dialogue.local', 'dialogue123', 'Sam Student', 'student');
 
@@ -60,13 +68,25 @@ for (const [sid, themes] of [
 }
 
 // Assignments
-await sb.from('student_supervisor_assignments').upsert(
+const { error: assignmentError } = await sb.from('student_supervisor_assignments').upsert(
 	[
 		{ student_id: stu1Id, supervisor_id: supId, assigned_by: adminId },
-		{ student_id: stu2Id, supervisor_id: supId, assigned_by: adminId }
+		{ student_id: stu2Id, supervisor_id: supId, assigned_by: adminId },
+		{ student_id: stu1Id, supervisor_id: editorId, assigned_by: adminId },
+		{ student_id: stu2Id, supervisor_id: editorId, assigned_by: adminId }
 	],
 	{ onConflict: 'student_id,supervisor_id' }
 );
+if (assignmentError) throw assignmentError;
+
+const { error: teacherLinkError } = await sb.from('teacher_student_links').upsert(
+	[
+		{ student_id: stu1Id, teacher_id: teacherId, assigned_by: adminId },
+		{ student_id: stu2Id, teacher_id: teacherId, assigned_by: adminId }
+	],
+	{ onConflict: 'teacher_id,student_id' }
+);
+if (teacherLinkError) throw teacherLinkError;
 
 async function ensureMaterial(payload: {
 	type: 'document' | 'webinar';
@@ -192,6 +212,12 @@ for (let i = 0; i < webQs.length; i++) {
 	if (error) throw error;
 }
 
+for (const sid of [stu1Id, stu2Id]) {
+	const { data: stage, error } = await sb.rpc('compute_stage', { p_student: sid });
+	if (error) throw error;
+	await sb.from('profiles').update({ current_stage: stage }).eq('id', sid);
+}
+
 console.log('✓ Seed complete.');
-console.log('Login as: admin@dialogue.local · sup1@dialogue.local · stu1@dialogue.local · stu2@dialogue.local');
+console.log('Login as: admin@dialogue.local · editor@dialogue.local · teacher@school.test · stu1@dialogue.local · stu2@dialogue.local');
 console.log('Password (all): dialogue123');

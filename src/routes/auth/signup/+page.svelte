@@ -10,7 +10,7 @@
 		<h1 class="heading-1 mt-1">Student</h1>
 		<p class="body-text mt-2">
 			Anyone can apply. You'll set up your profile, pick two themes, take two short quizzes,
-			submit five pitches and write two articles with feedback from a supervisor.
+			submit five pitches and write two articles with feedback from an editor.
 		</p>
 
 		{#if form?.sent}
@@ -56,11 +56,16 @@
 		<p class="meta-text">Have an invitation?</p>
 		<div class="grid sm:grid-cols-2 gap-3 mt-3">
 			<a
-				href="/auth/signup/supervisor"
+				href="/auth/signup/editor"
 				class="card !p-4 hover:border-accent-blue transition-colors"
 			>
 				<p class="meta-text">By invitation</p>
-				<h3 class="heading-3 mt-1">I'm a supervisor</h3>
+				<h3 class="heading-3 mt-1">I'm an editor</h3>
+				<p class="body-text text-xs mt-1">Use the link an admin sent you.</p>
+			</a>
+			<a href="/auth/signup/teacher" class="card !p-4 hover:border-accent-blue transition-colors">
+				<p class="meta-text">By invitation</p>
+				<h3 class="heading-3 mt-1">I'm a teacher</h3>
 				<p class="body-text text-xs mt-1">Use the link an admin sent you.</p>
 			</a>
 			<a href="/auth/signup/admin" class="card !p-4 hover:border-accent-blue transition-colors">

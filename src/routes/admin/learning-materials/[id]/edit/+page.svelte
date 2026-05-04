@@ -11,21 +11,21 @@
 	{#if form?.error}<div class="alert-error">{form.error}</div>{/if}
 	<input type="hidden" name="type" value={data.material.type} />
 	<div>
-		<label class="label">Title</label>
-		<input name="title" required class="input" value={data.material.title} />
+		<label class="label" for="material_title">Title</label>
+		<input id="material_title" name="title" required class="input" value={data.material.title} />
 	</div>
 	<div>
-		<label class="label">Description</label>
-		<textarea name="description" rows="3" class="textarea">{data.material.description}</textarea>
+		<label class="label" for="material_description">Description</label>
+		<textarea id="material_description" name="description" rows="3" class="textarea">{data.material.description}</textarea>
 	</div>
 	<div>
-		<label class="label">Replace file (optional)</label>
-		<input type="file" name="file" accept="application/pdf,video/*" class="input" />
+		<label class="label" for="material_file">Replace file (optional)</label>
+		<input id="material_file" type="file" name="file" accept="application/pdf,video/*" class="input" />
 		{#if data.material.storage_path}<p class="meta-text mt-1">Current path: {data.material.storage_path}</p>{/if}
 	</div>
 	<div>
-		<label class="label">Video URL</label>
-		<input name="video_url" type="url" class="input" value={data.material.video_url ?? ''} />
+		<label class="label" for="material_video_url">Video URL</label>
+		<input id="material_video_url" name="video_url" type="url" class="input" value={data.material.video_url ?? ''} />
 	</div>
 	<button class="btn-primary">Save changes</button>
 </form>

@@ -44,7 +44,7 @@ export function requireOnboardingComplete(locals: Locals) {
 export async function assertSupervisesStudent(locals: Locals, studentId: string) {
 	const { profile } = requireUser(locals);
 	if (profile.role === 'admin') return;
-	if (profile.role !== 'supervisor') throw error(403, 'Forbidden');
+	if (profile.role !== 'supervisor' && profile.role !== 'editor') throw error(403, 'Forbidden');
 
 	const { data } = await locals.supabase
 		.from('student_supervisor_assignments')
@@ -55,6 +55,22 @@ export async function assertSupervisesStudent(locals: Locals, studentId: string)
 	if (!data) throw error(403, 'Not assigned to this student');
 }
 
+/** Asserts the current teacher is the named teacher contact for the student. */
+export async function assertTeachesStudent(locals: Locals, studentId: string) {
+	const { profile } = requireUser(locals);
+	if (profile.role === 'admin') return;
+	if (profile.role !== 'teacher') throw error(403, 'Forbidden');
+
+	const { data } = await locals.supabase
+		.from('profiles')
+		.select('id')
+		.eq('id', studentId)
+		.eq('role', 'student')
+		.ilike('teacher_email', profile.email)
+		.maybeSingle();
+	if (!data) throw error(403, 'Not linked to this student');
+}
+
 /** Helpful: send signed-in users away from /auth/* pages. */
 export function redirectIfAuthed(locals: Locals) {
 	if (!locals.profile) return;
@@ -63,4 +79,3 @@ export function redirectIfAuthed(locals: Locals) {
 	}
 	throw redirect(303, dashboardForRole(locals.profile.role));
 }
-

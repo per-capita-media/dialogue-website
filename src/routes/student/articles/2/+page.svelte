@@ -14,7 +14,7 @@
 {#if !data.article}
 	<EmptyState
 		title="Article 2 not yet created"
-		description="Article 2 is created after pitch selection and stays locked until your supervisor (or an admin) opens it."
+		description="Article 2 is created after pitch selection and stays locked until your editor (or an admin) opens it."
 	/>
 {:else if data.article.locked}
 	<div class="mt-6"><ArticleLockScreen /></div>

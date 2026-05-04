@@ -1,26 +1,24 @@
 /**
- * Bulk-create staff accounts (admins) and print temporary passwords.
+ * Bulk-create staff accounts and print temporary passwords.
  *
  *   npm run add-staff
  *
  * Default behaviour: creates the two cam.ac.uk staff seeded into this script
- * as admins. Re-running is idempotent — existing users are skipped and a
- * notice is printed.
+ * as admins. Re-running is idempotent: existing users are kept and their
+ * profile role is reasserted.
  *
  * Custom emails:
  *   npm run add-staff -- --emails alice@example.com,bob@example.com
  *
  * Custom role:
- *   npm run add-staff -- --role supervisor
+ *   npm run add-staff -- --role editor
  *
  * Notes:
- *   • Admins automatically have access to /supervisor too (the supervisor
- *     layout accepts ['supervisor', 'admin']) — there is no concept of a
- *     user holding two roles in the schema, but admins can do everything a
- *     supervisor can do.
+ *   • Roles are single-valued. Admins manage everything; editors review only
+ *     assigned students; teachers see explicitly linked student progress.
  *   • Each new account gets a random 16-char password printed to stdout.
  *     Share it securely (Signal, password manager); the user should change
- *     it on first sign-in (Supabase doesn't enforce this in MVP — phase 2).
+ *     it on first sign-in.
  *   • Confirmation email is skipped (`email_confirm: true`) so the account
  *     is immediately usable.
  */
@@ -49,9 +47,9 @@ const emails = (args.emails ? String(args.emails) : DEFAULT_EMAILS.join(','))
 	.map((e) => e.trim())
 	.filter(Boolean);
 
-const role = (args.role ?? 'admin') as 'student' | 'supervisor' | 'admin';
-if (!['student', 'supervisor', 'admin'].includes(role)) {
-	console.error(`--role must be one of student | supervisor | admin (got ${role})`);
+const role = (args.role ?? 'admin') as 'student' | 'teacher' | 'supervisor' | 'editor' | 'admin';
+if (!['student', 'teacher', 'supervisor', 'editor', 'admin'].includes(role)) {
+	console.error(`--role must be one of student | teacher | supervisor | editor | admin (got ${role})`);
 	process.exit(1);
 }
 

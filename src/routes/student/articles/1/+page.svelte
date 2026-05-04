@@ -13,7 +13,7 @@
 {#if !data.article}
 	<EmptyState
 		title="Article 1 not yet created"
-		description="Once your supervisor selects two pitches, Article 1 will appear here."
+		description="Once your editor selects two pitches, Article 1 will appear here."
 	/>
 {:else}
 	<p class="meta-text mt-2">Status: {data.article.status}</p>

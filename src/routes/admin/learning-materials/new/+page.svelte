@@ -10,27 +10,27 @@
 	{#if form?.error}<div class="alert-error">{form.error}</div>{/if}
 
 	<div>
-		<label class="label">Type</label>
-		<select name="type" class="input">
+		<label class="label" for="material_type">Type</label>
+		<select id="material_type" name="type" class="input">
 			<option value="document">document</option>
 			<option value="webinar">webinar</option>
 		</select>
 	</div>
 	<div>
-		<label class="label">Title</label>
-		<input name="title" required class="input" />
+		<label class="label" for="material_title">Title</label>
+		<input id="material_title" name="title" required class="input" />
 	</div>
 	<div>
-		<label class="label">Description</label>
-		<textarea name="description" rows="3" class="textarea"></textarea>
+		<label class="label" for="material_description">Description</label>
+		<textarea id="material_description" name="description" rows="3" class="textarea"></textarea>
 	</div>
 	<div>
-		<label class="label">PDF file (for documents) or video file</label>
-		<input type="file" name="file" accept="application/pdf,video/*" class="input" />
+		<label class="label" for="material_file">PDF file (for documents) or video file</label>
+		<input id="material_file" type="file" name="file" accept="application/pdf,video/*" class="input" />
 	</div>
 	<div>
-		<label class="label">Or — external video URL (YouTube embed, Vimeo, etc.)</label>
-		<input name="video_url" type="url" placeholder="https://www.youtube.com/embed/…" class="input" />
+		<label class="label" for="material_video_url">Or — external video URL (YouTube embed, Vimeo, etc.)</label>
+		<input id="material_video_url" name="video_url" type="url" placeholder="https://www.youtube.com/embed/…" class="input" />
 	</div>
 	<button class="btn-primary">Create</button>
 </form>

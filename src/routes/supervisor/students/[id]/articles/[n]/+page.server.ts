@@ -9,7 +9,7 @@ import { loadArticleForStudent } from '$lib/server/queries/articles';
 const NSchema = z.coerce.number().int().refine((n) => n === 1 || n === 2);
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	requireRole(locals, ['supervisor', 'admin']);
+	requireRole(locals, ['supervisor', 'editor', 'admin']);
 	await assertSupervisesStudent(locals, params.id);
 	const n = NSchema.safeParse(params.n);
 	if (!n.success) throw error(404, 'Bad article number');
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 export const actions: Actions = {
 	feedback: async ({ request, locals, params }) => {
-		const { user } = requireRole(locals, ['supervisor', 'admin']);
+		const { user } = requireRole(locals, ['supervisor', 'editor', 'admin']);
 		await assertSupervisesStudent(locals, params.id);
 		const fd = await request.formData();
 		const articleId = String(fd.get('article_id') ?? '');
@@ -36,7 +36,7 @@ export const actions: Actions = {
 		return { posted: true };
 	},
 	status: async ({ request, locals, params }) => {
-		const { user } = requireRole(locals, ['supervisor', 'admin']);
+		const { user } = requireRole(locals, ['supervisor', 'editor', 'admin']);
 		await assertSupervisesStudent(locals, params.id);
 		const fd = await request.formData();
 		const articleId = String(fd.get('article_id') ?? '');
@@ -55,7 +55,7 @@ export const actions: Actions = {
 		return { posted: true };
 	},
 	unlock: async ({ request, locals, params }) => {
-		const { user } = requireRole(locals, ['supervisor', 'admin']);
+		const { user } = requireRole(locals, ['supervisor', 'editor', 'admin']);
 		await assertSupervisesStudent(locals, params.id);
 		const fd = await request.formData();
 		const articleId = String(fd.get('article_id') ?? '');

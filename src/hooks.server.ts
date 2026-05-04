@@ -16,6 +16,15 @@ import type { CookieOptions } from '@supabase/ssr';
 import type { Handle } from '@sveltejs/kit';
 import type { Profile } from '$lib/types/domain';
 
+const securityHeaders = {
+	'x-content-type-options': 'nosniff',
+	'x-frame-options': 'DENY',
+	'referrer-policy': 'strict-origin-when-cross-origin',
+	'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+	'content-security-policy':
+		"default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https: wss:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; form-action 'self'"
+};
+
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
@@ -56,7 +65,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.locals.profile = null;
 	}
 
-	return resolve(event, {
+	const response = await resolve(event, {
 		filterSerializedResponseHeaders: (name) => name === 'content-range'
 	});
+
+	for (const [name, value] of Object.entries(securityHeaders)) {
+		response.headers.set(name, value);
+	}
+	return response;
 };

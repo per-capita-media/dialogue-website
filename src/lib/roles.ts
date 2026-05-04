@@ -8,8 +8,12 @@ export function dashboardForRole(role: Role): string {
 	switch (role) {
 		case 'admin':
 			return '/admin';
+		case 'teacher':
+			return '/teacher';
+		case 'editor':
+			return '/editor';
 		case 'supervisor':
-			return '/supervisor';
+			return '/editor';
 		case 'student':
 			return '/student';
 	}
@@ -17,6 +21,8 @@ export function dashboardForRole(role: Role): string {
 
 export const ROLE_LABEL: Record<Role, string> = {
 	student: 'Student',
-	supervisor: 'Supervisor',
+	teacher: 'Teacher',
+	supervisor: 'Editor',
+	editor: 'Editor',
 	admin: 'Admin'
 };

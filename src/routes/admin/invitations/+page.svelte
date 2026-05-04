@@ -32,8 +32,8 @@
 
 <h1 class="heading-1">Invitations</h1>
 <p class="body-text mt-2">
-	Issue single-use signup links for new supervisors or admins. Anyone with the link can claim
-	the role exactly once before the link expires.
+	Issue single-use signup links for new editors, teachers, or admins. Anyone with the link can
+	claim the role exactly once before the link expires.
 </p>
 
 {#if !data.mailerReady}
@@ -63,6 +63,8 @@
 	<div>
 		<label class="label" for="role">Role</label>
 		<select id="role" name="role" required class="input">
+			<option value="editor">editor</option>
+			<option value="teacher">teacher</option>
 			<option value="supervisor">supervisor</option>
 			<option value="admin">admin</option>
 		</select>

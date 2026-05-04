@@ -7,7 +7,7 @@
 </script>
 
 <h1 class="heading-1">Tell us about yourself</h1>
-<p class="body-text mt-2">All fields are required. Used only by your supervisor and the team.</p>
+<p class="body-text mt-2">All fields are required. Used only by your editor, teacher contact, and the programme team.</p>
 
 <form method="POST" class="mt-8 space-y-4">
 	{#if form?.error}<div class="alert-error">{form.error}</div>{/if}

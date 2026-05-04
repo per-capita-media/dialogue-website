@@ -3,7 +3,7 @@
 A secure, role-based MVP for a journalism training scheme.
 
 - **Stack:** SvelteKit 2 (Svelte 5) · TypeScript · Tailwind 3 · Supabase (Auth + Postgres + Storage) · Vercel adapter
-- **Roles:** `student`, `supervisor`, `admin`
+- **Roles:** `student`, `teacher`, `editor`, `admin` (`supervisor` remains supported as a legacy editor-equivalent role)
 - **Defence in depth:** every protected SvelteKit layout calls a `requireRole(...)` guard, _and_ every Postgres table has Row-Level Security enforcing the same rules.
 
 ## Workflow
@@ -12,10 +12,10 @@ A secure, role-based MVP for a journalism training scheme.
 2. Reads a document and passes a multiple-choice quiz.
 3. Watches a webinar and passes a quiz.
 4. Submits **5 pitches** within their two themes.
-5. Supervisor selects exactly **2 pitches** (lower slot becomes Article 1, the other Article 2; Article 2 starts locked).
-6. Student drafts and submits Article 1; supervisor leaves feedback.
-7. Supervisor (or admin) **unlocks Article 2**; student writes & submits.
-8. Throughout, students can message their supervisor and admins. Admins can view & participate in everything.
+5. Editor selects exactly **2 pitches** (lower slot becomes Article 1, the other Article 2; Article 2 starts locked).
+6. Student drafts and submits Article 1; editor leaves feedback.
+7. Editor (or admin) **unlocks Article 2**; student writes & submits.
+8. Teachers see linked student progress only. Students can message their editor and admins. Admins can view and manage everything.
 
 ## Architecture
 
@@ -42,13 +42,15 @@ src/
     auth/{signup,login,logout,callback}
     onboarding/{profile,themes}
     student/                  ← dashboard, learning, pitches, articles, messages
-    supervisor/               ← dashboard, students/[id]/{pitches, articles/[n]}, messages
-    admin/                    ← stats, students, supervisors, assignments, themes,
+    editor/                   ← dashboard, students/[id]/{pitches, articles/[n]}, messages
+    teacher/                  ← linked-student progress dashboard + admin messages
+    supervisor/               ← legacy editor-equivalent route
+    admin/                    ← stats, students, editors, teachers, assignments, themes,
                                  pitches, articles, messages, learning-materials,
                                  quizzes, audit-log
     api/{upload-url, signed-asset/[...path]}
 supabase/
-  migrations/                 ← 001 → 012 (enums, profiles, themes, assignments,
+  migrations/                 ← ordered schema/RLS migrations
                                 materials/quizzes, attempts, pitches, articles,
                                 messaging, audit log, storage policies, compute_stage)
   seed.sql                    ← optional sample content
@@ -89,8 +91,8 @@ scripts/
 
 3. Run the migrations against your Supabase Postgres. Easiest: paste the
    pre-concatenated `supabase/build/all_migrations.sql` into the Supabase
-   SQL editor and click **Run**. Otherwise paste each `supabase/migrations/00X_*.sql`
-   in order, 001 → 017.
+   SQL editor and click **Run** on a fresh database. For an existing database,
+   apply only the new migration files that have not already been run.
 
    The migration files are deliberately split by concern so they apply in a
    dependency-safe order (types → tables → role helpers → RLS → triggers →
@@ -98,7 +100,7 @@ scripts/
    ever add a new migration, follow the same rule: any function used in RLS
    must only reference tables defined in earlier files.
 
-4. In the Supabase dashboard, create a **private** Storage bucket named `learning-materials`. Then run `supabase/migrations/011_storage_policies.sql`.
+4. In the Supabase dashboard, create a **private** Storage bucket named `learning-materials`. The storage policies are included in the ordered migrations.
 
 5. Bootstrap an admin (or seed sample data):
 
@@ -125,7 +127,7 @@ scripts/
 
 ## Email invitations (Resend)
 
-Supervisor and admin invitations are issued from `/admin/invitations`. By
+Editor, teacher, and admin invitations are issued from `/admin/invitations`. By
 default each invitation just creates a row in the database and shows you the
 URL to copy. If you also configure **Resend** (free tier covers MVP volume),
 the URL is emailed to the recipient automatically.
@@ -154,11 +156,11 @@ the URL is emailed to the recipient automatically.
 3. The "Send invitation email now" checkbox should be enabled (if it's
    greyed out the mailer isn't configured — see the alert at the top of the
    page; check your env vars and restart `dev`).
-4. Fill in: role = `supervisor`, recipient email = `salhananusha@gmail.com`,
+4. Fill in: role = `editor`, recipient email = `salhananusha@gmail.com`,
    expires in = `7` days. Submit.
 5. You should see a green "Invitation created. Email sent ✓" alert.
 6. Check the recipient inbox. The email contains an "Accept invitation"
-   button linking to `/auth/signup/supervisor?token=…`.
+   button linking to `/auth/signup/editor?token=…`.
 7. If the email never arrives, check the table — the URL is still there for
    manual sharing, and you can click **Resend email** on the row.
 
@@ -167,11 +169,11 @@ the URL is emailed to the recipient automatically.
 > `salhananusha@gmail.com` to your Resend account first (or verify a real
 > sending domain) before testing.
 
-## Three-role onboarding flows
+## Role onboarding flows
 
-The app has **one open public signup (student)** and **two invitation-only flows
-(supervisor, admin)**. Self-service for the elevated roles is intentionally not
-possible — anyone signing up as a supervisor would gain access to students' work.
+The app has **one open public signup (student)** and invitation-only staff flows
+for **editor**, **teacher**, and **admin**. Self-service for elevated roles is
+intentionally unavailable because staff roles can access private student data.
 
 ### Bootstrap the very first admin
 
@@ -189,20 +191,18 @@ checklist with the next steps below.
    the webinar).
 3. Visit **`/admin/quizzes/new`** → create one document quiz with at least 3 questions
    (use the question editor on the quiz detail page after creation). Repeat for a webinar quiz.
-4. Visit **`/admin/invitations`** → New → role = `supervisor` → copy the URL → send it to your
-   supervisor.
+4. Visit **`/admin/invitations`** → New → role = `editor` or `teacher` → copy the URL → send it to your staff member.
 5. Wait for students to sign up at **`/auth/signup`**. They will appear in **`/admin/students`**.
-6. Visit **`/admin/assignments`** → link your supervisor to each student. The supervisor will
-   immediately see those students on `/supervisor`.
+6. Visit **`/admin/assignments`** → link editors and teachers to students. Editors will see assigned students on `/editor`; teachers see linked progress on `/teacher`.
 
 The Getting Started card on `/admin` ticks off these steps as you do them.
 
-### First supervisor checklist
+### First editor checklist
 
 1. The admin sends you an invitation URL of the form
-   `https://your-app/auth/signup/supervisor?token=…`.
+   `https://your-app/auth/signup/editor?token=…`.
 2. Open it, fill in name + password → submit.
-3. You land on **`/supervisor`** with the list of students assigned to you (initially empty
+3. You land on **`/editor`** with the list of students assigned to you (initially empty
    until the admin links some).
 4. Once a student has submitted all 5 pitches, open the student → **Pitches** → select exactly
    two. They become Article 1 and Article 2 (Article 2 locked).
@@ -217,9 +217,9 @@ The Getting Started card on `/admin` ticks off these steps as you do them.
 4. Read the **document** → take the **document quiz** (you can retry until you pass).
 5. Watch the **webinar** → take the **webinar quiz**.
 6. Submit **5 pitches** across your two themes.
-7. Wait for your supervisor to select two. Article 1 unlocks first.
+7. Wait for your editor to select two. Article 1 unlocks first.
 8. Draft and submit **Article 1**. Read feedback. Iterate if revisions are requested.
-9. **Article 2** unlocks once your supervisor (or an admin) opens it. Draft and submit.
+9. **Article 2** unlocks once your editor (or an admin) opens it. Draft and submit.
 
 If you ever lose track of the next step, the **landing page (`/`)** and the **sidebar of
 your dashboard** both show a stage-aware "Next: …" hint with a one-click CTA.
@@ -230,8 +230,8 @@ After `npm run seed` you can:
 
 1. Sign in as `stu1@dialogue.local` / `dialogue123`. The dashboard already shows themes and the learning steps. Take both quizzes (questions are real — the seed has correct answers in the DB).
 2. Submit 5 pitches across the two themes.
-3. Sign in as `sup1@dialogue.local`. You should see `stu1` and `stu2` in your supervisor dashboard. Pick exactly 2 pitches — Article 1 + Article 2 rows are created (Article 2 locked).
-4. As `stu1`, draft and submit Article 1. As `sup1`, leave feedback, mark approved, and click **Unlock article 2**.
+3. Sign in as `editor@dialogue.local`. You should see `stu1` and `stu2` in your editor dashboard. Pick exactly 2 pitches — Article 1 + Article 2 rows are created (Article 2 locked).
+4. As `stu1`, draft and submit Article 1. As `editor@dialogue.local`, leave feedback, mark approved, and click **Unlock article 2**.
 5. As `stu1`, write & submit Article 2.
 6. Sign in as `admin@dialogue.local` to see global tables and the audit log.
 

@@ -25,7 +25,7 @@
 		placeholder="Type a message…"
 		class="textarea flex-1"
 		required
-	/>
+	></textarea>
 	<button type="submit" class="btn-primary" disabled={!body.trim() || sending}>
 		{sending ? 'Sending…' : 'Send'}
 	</button>

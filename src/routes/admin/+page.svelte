@@ -7,7 +7,7 @@
 
 	const items = [
 		{ label: 'Students', value: data.stats.students },
-		{ label: 'Supervisors', value: data.stats.supervisors },
+		{ label: 'Editors', value: data.stats.supervisors },
 		{ label: 'Pitches', value: data.stats.pitches },
 		{ label: 'Articles', value: data.stats.articles },
 		{ label: 'Quiz attempts', value: data.stats.attempts }
@@ -18,14 +18,14 @@
 		{ done: data.setup.hasDocQuiz, label: 'Create a document quiz', href: '/admin/quizzes/new' },
 		{ done: data.setup.hasWebMaterial, label: 'Add a webinar (file or URL)', href: '/admin/learning-materials/new' },
 		{ done: data.setup.hasWebQuiz, label: 'Create a webinar quiz', href: '/admin/quizzes/new' },
-		{ done: data.setup.hasSupervisor, label: 'Invite a supervisor', href: '/admin/invitations' },
+		{ done: data.setup.hasSupervisor, label: 'Invite an editor', href: '/admin/invitations' },
 		{ done: data.setup.hasStudent, label: 'Wait for the first student to sign up at /auth/signup', href: '/admin/students' }
 	];
 	$: setupIncomplete = setupSteps.filter((s) => !s.done);
 
 	$: queueActions = [
 		{
-			label: 'Pitches awaiting supervisor selection',
+			label: 'Pitches awaiting editor selection',
 			count: data.queue.pendingPitchSelect,
 			href: '/admin/pitches',
 			tone: 'warn' as const
@@ -51,7 +51,7 @@
 		<p class="meta-text mt-1">Programme overview · live</p>
 	</div>
 	<div class="flex gap-2">
-		<a href="/admin/invitations" class="btn-secondary text-xs">Invite supervisor</a>
+		<a href="/admin/invitations" class="btn-secondary text-xs">Invite editor</a>
 		<a href="/admin/learning-materials/new" class="btn-primary text-xs">+ Material</a>
 	</div>
 </div>

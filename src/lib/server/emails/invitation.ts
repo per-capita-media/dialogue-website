@@ -15,7 +15,12 @@ export interface InvitationEmailArgs {
 
 export function renderInvitationEmail(args: InvitationEmailArgs): { subject: string; html: string; text: string } {
 	const site = args.siteName ?? 'Dialogue Intro to Journalism';
-	const roleLabel = args.role === 'admin' ? 'Admin' : 'Supervisor';
+	const roleLabel =
+		args.role === 'admin'
+			? 'Admin'
+			: args.role === 'teacher'
+				? 'Teacher'
+				: 'Editor';
 	const expires = new Date(args.expiresAt).toLocaleString();
 	const inviter = args.inviterName ? args.inviterName : 'A site admin';
 

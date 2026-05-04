@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { data: supervisors } = await locals.supabase
 		.from('profiles')
 		.select('*')
-		.eq('role', 'supervisor')
+		.in('role', ['supervisor', 'editor'])
 		.order('created_at', { ascending: false });
 
 	const { data: counts } = await locals.supabase

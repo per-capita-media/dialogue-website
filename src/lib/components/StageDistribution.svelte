@@ -38,7 +38,7 @@
 						<span class="meta-text">{n}</span>
 					</div>
 					<div class="h-2 mt-1 rounded bg-journal-border dark:bg-journal-border-dark overflow-hidden">
-						<div class={`h-full ${bar(STAGE_TONE[stage])}`} style:width={`${(n / max) * 100}%`} />
+						<div class={`h-full ${bar(STAGE_TONE[stage])}`} style:width={`${(n / max) * 100}%`}></div>
 					</div>
 				</li>
 			{/each}

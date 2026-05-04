@@ -5,7 +5,7 @@ import { logAudit } from '$lib/server/audit';
 import { supabaseAdmin } from '$lib/server/supabase-admin';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	requireRole(locals, ['supervisor', 'admin']);
+	requireRole(locals, ['supervisor', 'editor', 'admin']);
 	await assertSupervisesStudent(locals, params.id);
 
 	const { data: pitches } = await locals.supabase
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 export const actions: Actions = {
 	/** Select exactly 2 pitches and create the matching article rows. */
 	select: async ({ request, locals, params }) => {
-		const { user } = requireRole(locals, ['supervisor', 'admin']);
+		const { user } = requireRole(locals, ['supervisor', 'editor', 'admin']);
 		await assertSupervisesStudent(locals, params.id);
 
 		const fd = await request.formData();

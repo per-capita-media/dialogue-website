@@ -42,7 +42,7 @@
 		<form method="POST" action="?/feedback" class="mt-4 space-y-3">
 			{#if form?.error}<div class="alert-error">{form.error}</div>{/if}
 			<input type="hidden" name="article_id" value={data.article.id} />
-			<textarea name="body" rows="4" required class="textarea" placeholder="Leave constructive feedback…" />
+			<textarea name="body" rows="4" required class="textarea" placeholder="Leave constructive feedback…"></textarea>
 			<button class="btn-primary" type="submit">Post feedback</button>
 		</form>
 	</section>

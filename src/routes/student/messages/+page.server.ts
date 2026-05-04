@@ -7,8 +7,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = requireRole(locals, 'student');
 	const conversations = await listConversationsFor(locals.supabase, user.id);
 
-	// Help the student start a conversation with their supervisor(s) or admin.
-	const { data: supervisors } = await locals.supabase
+	// Help the student start a conversation with their assigned editor(s) or admin.
+	const { data: editors } = await locals.supabase
 		.from('student_supervisor_assignments')
 		.select('supervisor_id, supervisor:profiles!student_supervisor_assignments_supervisor_id_fkey(full_name)')
 		.eq('student_id', user.id);
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		conversations,
-		supervisors: (supervisors ?? []).map((r: any) => ({ id: r.supervisor_id, name: r.supervisor?.full_name })),
+		editors: (editors ?? []).map((r: any) => ({ id: r.supervisor_id, name: r.supervisor?.full_name })),
 		admins: admins ?? []
 	};
 };

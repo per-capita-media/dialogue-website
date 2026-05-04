@@ -4,7 +4,7 @@ import { listConversationsFor, getOrCreateConversation } from '$lib/server/queri
 import { fail, redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const { user } = requireRole(locals, ['supervisor', 'admin']);
+	const { user } = requireRole(locals, ['supervisor', 'editor', 'admin']);
 	const conversations = await listConversationsFor(locals.supabase, user.id);
 
 	const { data: assigned } = await locals.supabase
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	open: async ({ request, locals }) => {
-		const { user } = requireRole(locals, ['supervisor', 'admin']);
+		const { user } = requireRole(locals, ['supervisor', 'editor', 'admin']);
 		const fd = await request.formData();
 		const target = String(fd.get('target') ?? '');
 		const kind = String(fd.get('kind') ?? '');

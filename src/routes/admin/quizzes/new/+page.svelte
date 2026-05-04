@@ -8,19 +8,19 @@
 <form method="POST" class="card mt-6 space-y-4">
 	{#if form?.error}<div class="alert-error">{form.error}</div>{/if}
 	<div>
-		<label class="label">Type</label>
-		<select name="type" class="input">
+		<label class="label" for="quiz_type">Type</label>
+		<select id="quiz_type" name="type" class="input">
 			<option value="document">document</option>
 			<option value="webinar">webinar</option>
 		</select>
 	</div>
 	<div>
-		<label class="label">Title</label>
-		<input name="title" required class="input" />
+		<label class="label" for="quiz_title">Title</label>
+		<input id="quiz_title" name="title" required class="input" />
 	</div>
 	<div>
-		<label class="label">Pass threshold (%)</label>
-		<input name="pass_threshold" type="number" min="0" max="100" value="70" class="input" />
+		<label class="label" for="quiz_pass_threshold">Pass threshold (%)</label>
+		<input id="quiz_pass_threshold" name="pass_threshold" type="number" min="0" max="100" value="70" class="input" />
 	</div>
 	<button class="btn-primary">Create & add questions</button>
 </form>

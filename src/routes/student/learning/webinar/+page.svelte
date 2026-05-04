@@ -21,9 +21,11 @@
 					allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 					allowfullscreen
 					class="w-full h-full"
-				/>
+				></iframe>
 			{:else}
-				<video controls src={data.videoSrc} class="w-full h-full"></video>
+				<video controls src={data.videoSrc} class="w-full h-full">
+					<track kind="captions" />
+				</video>
 			{/if}
 		</div>
 	</div>

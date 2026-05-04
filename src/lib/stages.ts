@@ -13,7 +13,7 @@ export const STAGE_LABEL: Record<StudentStage, string> = {
 	webinar_quiz_complete: 'Webinar quiz complete',
 	pitches_in_progress: 'Pitches in progress',
 	pitches_submitted: 'All 5 pitches submitted',
-	awaiting_supervisor_selection: 'Awaiting supervisor selection',
+	awaiting_supervisor_selection: 'Awaiting editor selection',
 	pitches_selected: '2 pitches selected',
 	article_1_unlocked: 'Article 1 unlocked',
 	article_1_submitted: 'Article 1 submitted',
@@ -59,8 +59,8 @@ export const STAGE_TONE: Record<StudentStage, 'info' | 'warn' | 'success' | 'mut
  * What is the user's most actionable next step? Used by the landing-page
  * `NextStepPanel` and the in-dashboard sidebar hint, so they always agree.
  *
- * For students this is computed from `current_stage`; for supervisors and
- * admins it's a constant pointer at their dashboard.
+ * For students this is computed from `current_stage`; for staff it points at
+ * their relevant dashboard.
  */
 export interface NextStep {
 	headline: string; // short imperative, e.g. "Read the document"
@@ -102,25 +102,25 @@ const STUDENT_NEXT: Record<StudentStage, NextStep> = {
 	},
 	webinar_quiz_complete: {
 		headline: 'Start your 5 pitches',
-		detail: 'Submit five pitches across your two themes. Your supervisor will pick two.',
+		detail: 'Submit five pitches across your two themes. Your editor will pick two.',
 		href: '/student/pitches',
 		cta: 'Open pitches'
 	},
 	pitches_in_progress: {
 		headline: 'Keep filling your pitches',
-		detail: 'You need five submitted pitches before your supervisor can select two.',
+		detail: 'You need five submitted pitches before your editor can select two.',
 		href: '/student/pitches',
 		cta: 'Open pitches'
 	},
 	pitches_submitted: {
-		headline: 'Awaiting supervisor selection',
-		detail: 'Your five pitches are in. Your supervisor will choose two soon.',
+		headline: 'Awaiting editor selection',
+		detail: 'Your five pitches are in. Your editor will choose two soon.',
 		href: '/student/pitches',
 		cta: 'View pitches'
 	},
 	awaiting_supervisor_selection: {
-		headline: 'Awaiting supervisor selection',
-		detail: 'Your supervisor is reviewing your pitches and will pick two.',
+		headline: 'Awaiting editor selection',
+		detail: 'Your editor is reviewing your pitches and will pick two.',
 		href: '/student/pitches',
 		cta: 'View pitches'
 	},
@@ -132,37 +132,37 @@ const STUDENT_NEXT: Record<StudentStage, NextStep> = {
 	},
 	article_1_unlocked: {
 		headline: 'Draft Article 1',
-		detail: 'Write and submit your first article for supervisor feedback.',
+		detail: 'Write and submit your first article for editor feedback.',
 		href: '/student/articles/1',
 		cta: 'Open Article 1'
 	},
 	article_1_submitted: {
-		headline: 'Article 1 with your supervisor',
-		detail: 'Submitted — your supervisor will leave feedback shortly.',
+		headline: 'Article 1 with your editor',
+		detail: 'Submitted — your editor will leave feedback shortly.',
 		href: '/student/articles/1',
 		cta: 'View feedback'
 	},
 	article_1_under_review: {
 		headline: 'Article 1 under review',
-		detail: 'Your supervisor is reading. You will be notified of feedback.',
+		detail: 'Your editor is reading. You will be notified of feedback.',
 		href: '/student/articles/1',
 		cta: 'View Article 1'
 	},
 	article_1_revision_requested: {
 		headline: 'Revise Article 1',
-		detail: 'Your supervisor has asked for changes. Re-open the draft to make edits.',
+		detail: 'Your editor has asked for changes. Re-open the draft to make edits.',
 		href: '/student/articles/1',
 		cta: 'Revise Article 1'
 	},
 	article_1_complete: {
 		headline: 'Article 1 approved',
-		detail: 'Article 2 will unlock once your supervisor opens it.',
+		detail: 'Article 2 will unlock once your editor opens it.',
 		href: '/student/articles/2',
 		cta: 'View Article 2'
 	},
 	article_2_locked: {
 		headline: 'Article 2 locked',
-		detail: 'Your supervisor (or an admin) will unlock it when ready.',
+		detail: 'Your editor (or an admin) will unlock it when ready.',
 		href: '/student/articles/2',
 		cta: 'View Article 2'
 	},
@@ -173,20 +173,20 @@ const STUDENT_NEXT: Record<StudentStage, NextStep> = {
 		cta: 'Open Article 2'
 	},
 	article_2_submitted: {
-		headline: 'Article 2 with your supervisor',
-		detail: 'Submitted — your supervisor will leave feedback shortly.',
+		headline: 'Article 2 with your editor',
+		detail: 'Submitted — your editor will leave feedback shortly.',
 		href: '/student/articles/2',
 		cta: 'View Article 2'
 	},
 	article_2_under_review: {
 		headline: 'Article 2 under review',
-		detail: 'Your supervisor is reading.',
+		detail: 'Your editor is reading.',
 		href: '/student/articles/2',
 		cta: 'View Article 2'
 	},
 	article_2_revision_requested: {
 		headline: 'Revise Article 2',
-		detail: 'Your supervisor has asked for changes.',
+		detail: 'Your editor has asked for changes.',
 		href: '/student/articles/2',
 		cta: 'Revise Article 2'
 	},
@@ -198,22 +198,34 @@ const STUDENT_NEXT: Record<StudentStage, NextStep> = {
 	},
 	programme_complete: {
 		headline: 'Programme complete!',
-		detail: 'Both articles approved. Well done — you can keep messaging your supervisor.',
+		detail: 'Both articles approved. Well done — you can keep messaging your editor.',
 		href: '/student',
 		cta: 'View dashboard'
 	}
 };
 
 const ROLE_NEXT: Record<Exclude<Role, 'student'>, NextStep> = {
+	teacher: {
+		headline: 'Open your teacher dashboard',
+		detail: 'Track linked students from your school and message the programme team.',
+		href: '/teacher',
+		cta: 'Open teacher dashboard'
+	},
 	supervisor: {
-		headline: 'Open your supervisor dashboard',
+		headline: 'Open your editor dashboard',
 		detail: 'See your assigned students, review their pitches, and leave article feedback.',
-		href: '/supervisor',
-		cta: 'Open supervisor dashboard'
+		href: '/editor',
+		cta: 'Open editor dashboard'
+	},
+	editor: {
+		headline: 'Open your editor dashboard',
+		detail: 'See your assigned students, review their pitches, and leave article feedback.',
+		href: '/editor',
+		cta: 'Open editor dashboard'
 	},
 	admin: {
 		headline: 'Open the admin console',
-		detail: 'Manage students, supervisors, content, and invitations.',
+		detail: 'Manage students, teachers, editors, content, and invitations.',
 		href: '/admin',
 		cta: 'Open admin dashboard'
 	}

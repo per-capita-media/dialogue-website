@@ -1,5 +1,5 @@
 /**
- * Admin: list, issue, and revoke supervisor/admin invitations. The signup
+ * Admin: list, issue, and revoke staff invitations. The signup
  * URL is rendered server-side so admins can copy & share it. Optionally —
  * when `RESEND_API_KEY` + `MAIL_FROM` are set — the invitation is emailed
  * to the recipient automatically. The URL stays visible in the UI either
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 const CreateSchema = z.object({
-	role: z.enum(['supervisor', 'admin']),
+	role: z.enum(['editor', 'teacher', 'supervisor', 'admin']),
 	email: z.string().email(),
 	expires_in_days: z.coerce.number().int().min(1).max(30).default(7),
 	send_email: z

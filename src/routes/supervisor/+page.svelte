@@ -29,7 +29,7 @@
 
 <div class="flex items-center justify-between flex-wrap gap-3">
 	<div>
-		<h1 class="heading-1">Supervisor dashboard</h1>
+		<h1 class="heading-1">Editor dashboard</h1>
 		<p class="meta-text mt-1">Your assigned students · live</p>
 	</div>
 	<a href="/supervisor/messages" class="btn-secondary text-xs">

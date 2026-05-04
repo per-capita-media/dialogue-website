@@ -9,7 +9,7 @@
 		<h2 class="heading-2">{data.material.title}</h2>
 		<p class="body-text mt-1">{data.material.description}</p>
 		{#if data.signedUrl}
-			<iframe title={data.material.title} src={data.signedUrl} class="w-full h-[70vh] mt-4 rounded-lg border border-journal-border dark:border-journal-border-dark" />
+			<iframe title={data.material.title} src={data.signedUrl} class="w-full h-[70vh] mt-4 rounded-lg border border-journal-border dark:border-journal-border-dark"></iframe>
 		{:else}
 			<div class="alert-error mt-4">Document not yet uploaded by admin.</div>
 		{/if}

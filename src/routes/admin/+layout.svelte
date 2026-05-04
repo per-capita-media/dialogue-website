@@ -3,7 +3,7 @@
 	const links = [
 		{ href: '/admin', label: 'Overview' },
 		{ href: '/admin/students', label: 'Students' },
-		{ href: '/admin/supervisors', label: 'Supervisors' },
+		{ href: '/admin/supervisors', label: 'Editors' },
 		{ href: '/admin/assignments', label: 'Assignments' },
 		{ href: '/admin/invitations', label: 'Invitations' },
 		{ href: '/admin/themes', label: 'Theme overrides' },

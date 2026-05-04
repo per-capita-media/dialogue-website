@@ -34,11 +34,11 @@
 <section class="mt-10">
 	<h2 class="heading-2">Start a conversation</h2>
 	<div class="grid md:grid-cols-2 gap-4 mt-4">
-		{#each data.supervisors as s}
+		{#each data.editors as s}
 			<form method="POST" action="?/open" class="card !p-4 flex justify-between items-center">
 				<div>
-					<div class="meta-text">Supervisor</div>
-					<div class="font-semibold text-sm">{s.name ?? 'Supervisor'}</div>
+					<div class="meta-text">Editor</div>
+					<div class="font-semibold text-sm">{s.name ?? 'Editor'}</div>
 				</div>
 				<input type="hidden" name="target" value={s.id} />
 				<input type="hidden" name="kind" value="student_supervisor" />
