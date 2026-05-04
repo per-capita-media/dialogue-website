@@ -10,31 +10,35 @@
 </script>
 
 <header
-	class="sticky top-0 z-30 backdrop-blur bg-journal-bg/80 dark:bg-journal-bg-dark/80 border-b border-journal-border dark:border-journal-border-dark"
+	class="sticky top-0 z-30 bg-journal-bg/95 dark:bg-journal-bg-dark/95 border-b-2 border-journal-text dark:border-journal-text-dark"
 >
-	<div class="container flex items-center justify-between py-4">
-		<a href="/" class="flex items-center gap-3 group">
-			<span
-				class="inline-flex w-8 h-8 rounded bg-accent-blue items-center justify-center text-white font-display text-base"
-				>D</span
-			>
-			<span class="heading-1 group-hover:text-accent-blue transition-colors text-base md:text-lg">
-				Dialogue
+	<div class="container flex items-center justify-between py-3">
+		<a href="/" class="group flex items-center gap-3">
+			<img
+				src="/per-capita-logo.jpg"
+				alt="Per Capita Media"
+				class="h-11 w-11 rounded-sm object-cover"
+			/>
+			<span>
+				<span class="block font-display text-2xl font-bold leading-none group-hover:text-accent-red transition-colors">
+					Dialogue
+				</span>
+				<span class="meta-text block text-[0.58rem]">Per Capita Media</span>
 			</span>
 		</a>
 
 		<nav class="flex items-center gap-2 md:gap-4">
 			{#if dashHref}
-				<a href={dashHref} class="text-sm font-medium hover:text-accent-blue transition-colors"
+				<a href={dashHref} class="text-sm font-semibold hover:text-accent-red transition-colors"
 					>Dashboard</a
 				>
 				<form method="POST" action="/auth/logout">
-					<button type="submit" class="text-sm font-medium hover:text-accent-red transition-colors"
+					<button type="submit" class="text-sm font-semibold hover:text-accent-red transition-colors"
 						>Sign out</button
 					>
 				</form>
 			{:else}
-				<a href="/auth/login" class="text-sm font-medium hover:text-accent-blue transition-colors"
+				<a href="/auth/login" class="text-sm font-semibold hover:text-accent-red transition-colors"
 					>Sign in</a
 				>
 				<a href="/auth/signup" class="btn-primary text-xs px-3 py-1.5">Apply</a>

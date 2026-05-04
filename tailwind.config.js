@@ -5,28 +5,26 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-				display: ['"Rammetto One"', 'system-ui', 'sans-serif']
+				sans: ['"Manrope"', 'Avenir Next', 'system-ui', 'sans-serif'],
+				display: ['"Playfair Display"', 'Georgia', 'serif']
 			},
 			colors: {
-				// Accent palette (Bauhaus highlights, used sparingly)
 				accent: {
-					red: '#FF4A1C',
-					blue: '#1C4CBD',
-					yellow: '#FFB800'
+					red: '#8F1D1D',
+					blue: '#1F3F5B',
+					yellow: '#B8913B'
 				},
-				// Page palette (light + dark variants)
 				journal: {
-					bg: '#FFFFFF',
-					'bg-dark': '#0A1629',
+					bg: '#FDFBF7',
+					'bg-dark': '#161412',
 					surface: '#FFFFFF',
-					'surface-dark': '#1A2A49',
-					border: '#E5E7EB',
-					'border-dark': '#1E3A5F',
-					text: '#1A1A1A',
-					'text-dark': '#E8E8E3',
-					muted: '#6B7280',
-					'muted-dark': '#94A3B8'
+					'surface-dark': '#211E1A',
+					border: '#D8D0C4',
+					'border-dark': '#443C33',
+					text: '#141414',
+					'text-dark': '#F2EEE7',
+					muted: '#675F55',
+					'muted-dark': '#B9B0A5'
 				}
 			},
 			container: {

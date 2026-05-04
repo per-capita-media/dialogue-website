@@ -2,17 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system inherited from the pico-research template:
-   Rammetto One (display) + Space Grotesk (body) on a Bauhaus-flavoured
-   neutral palette with red/blue/yellow accents. Reusable component
-   classes (`.card`, `.btn-*`, `.input`, `.textarea`, `.label`,
-   `.heading-*`, `.body-text`, `.meta-text`, `.badge-*`) keep markup
-   tidy across the role dashboards. */
+/* Editorial design system aligned to Per Capita Media:
+   serif display type, quiet paper tones, black rules, and restrained
+   access controls for the private Dialogue workspace. */
 
 @layer base {
 	html {
 		@apply antialiased;
-		font-feature-settings: 'ss01', 'ss02', 'cv01';
 	}
 
 	body {
@@ -20,7 +16,7 @@
 	}
 
 	::selection {
-		@apply bg-accent-blue/15 text-journal-text dark:text-journal-text-dark;
+		@apply bg-accent-yellow/25 text-journal-text dark:text-journal-text-dark;
 	}
 }
 
@@ -28,20 +24,21 @@
 	/* ── Typography ─────────────────────────────── */
 
 	.heading-display {
-		@apply text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-tight font-bold;
+		@apply text-4xl md:text-5xl lg:text-6xl leading-[0.98] font-bold;
 		@apply text-journal-text dark:text-journal-text-dark;
-		font-family: 'Space Grotesk', system-ui, sans-serif;
+		font-family: 'Playfair Display', Georgia, serif;
 	}
 
 	.heading-1 {
-		@apply text-xl md:text-2xl leading-tight tracking-tight;
+		@apply text-2xl md:text-3xl leading-tight font-bold;
 		@apply text-journal-text dark:text-journal-text-dark;
-		font-family: 'Rammetto One', system-ui, sans-serif;
+		font-family: 'Playfair Display', Georgia, serif;
 	}
 
 	.heading-2 {
-		@apply text-lg md:text-xl font-bold tracking-tight;
+		@apply text-xl md:text-2xl font-bold;
 		@apply text-journal-text dark:text-journal-text-dark;
+		font-family: 'Playfair Display', Georgia, serif;
 	}
 
 	.heading-3 {
@@ -55,7 +52,7 @@
 	}
 
 	.meta-text {
-		@apply text-xs font-medium uppercase tracking-[0.15em];
+		@apply text-xs font-semibold uppercase tracking-[0.12em];
 		@apply text-journal-muted dark:text-journal-muted-dark;
 	}
 
@@ -72,7 +69,7 @@
 	/* ── Cards & Surfaces ───────────────────────── */
 
 	.card {
-		@apply relative p-6 overflow-hidden rounded-lg;
+		@apply relative p-6 overflow-hidden rounded-sm;
 		@apply bg-journal-surface dark:bg-journal-surface-dark;
 		@apply border border-journal-border dark:border-journal-border-dark;
 	}
@@ -80,13 +77,13 @@
 	/* ── Buttons ────────────────────────────────── */
 
 	.btn-primary {
-		@apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold tracking-wide rounded-lg;
+		@apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold tracking-wide rounded-sm;
 		@apply bg-journal-text dark:bg-journal-text-dark text-journal-bg dark:text-journal-bg-dark;
 		@apply hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed;
 	}
 
 	.btn-secondary {
-		@apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium tracking-wide rounded-lg;
+		@apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold tracking-wide rounded-sm;
 		@apply border border-journal-border dark:border-journal-border-dark;
 		@apply text-journal-text dark:text-journal-text-dark;
 		@apply hover:bg-journal-text/5 dark:hover:bg-journal-text-dark/5;
@@ -94,14 +91,14 @@
 	}
 
 	.btn-danger {
-		@apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg;
+		@apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-sm;
 		@apply bg-accent-red text-white hover:opacity-80 transition-opacity disabled:opacity-50;
 	}
 
 	/* ── Form elements ──────────────────────────── */
 
 	.input {
-		@apply w-full px-4 py-2.5 text-sm rounded-lg;
+		@apply w-full px-4 py-2.5 text-sm rounded-sm;
 		@apply bg-journal-surface dark:bg-journal-surface-dark;
 		@apply border border-journal-border dark:border-journal-border-dark;
 		@apply text-journal-text dark:text-journal-text-dark;
@@ -111,7 +108,7 @@
 	}
 
 	.textarea {
-		@apply w-full px-4 py-3 text-sm rounded-lg;
+		@apply w-full px-4 py-3 text-sm rounded-sm;
 		@apply bg-journal-surface dark:bg-journal-surface-dark;
 		@apply border border-journal-border dark:border-journal-border-dark;
 		@apply text-journal-text dark:text-journal-text-dark;
@@ -128,7 +125,7 @@
 	/* ── Badges ─────────────────────────────────── */
 
 	.badge {
-		@apply inline-flex items-center px-2.5 py-0.5 text-xs font-semibold tracking-wide rounded-full;
+		@apply inline-flex items-center px-2.5 py-0.5 text-xs font-semibold tracking-wide rounded-sm;
 	}
 
 	.badge-info {
@@ -154,10 +151,10 @@
 	/* ── Form messages ──────────────────────────── */
 
 	.alert-error {
-		@apply p-3 rounded-lg border border-accent-red/30 bg-accent-red/5 text-accent-red text-sm;
+		@apply p-3 rounded-sm border border-accent-red/30 bg-accent-red/5 text-accent-red text-sm;
 	}
 
 	.alert-success {
-		@apply p-3 rounded-lg border border-green-500/30 bg-green-500/5 text-green-700 dark:text-green-400 text-sm;
+		@apply p-3 rounded-sm border border-green-500/30 bg-green-500/5 text-green-700 dark:text-green-400 text-sm;
 	}
 }
